@@ -6,6 +6,8 @@ export const ContactsList = styled.ul`
   flex-direction: column;
   width: 400px;
   outline: 1px solid grey;
+  border-radius: 20px;
+  background-color: #d3d3d3;
   padding: 10px;
 `;
 
