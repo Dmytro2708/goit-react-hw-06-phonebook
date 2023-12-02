@@ -1,31 +1,40 @@
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact, getContacts } from 'redux/contactsSlice';
+
 import { Formik, Field, ErrorMessage } from 'formik';
 import { StyledForm } from './NameInput.styled';
 import * as Yup from 'yup';
 
 const NameInputSchema = Yup.object().shape({
-  name: Yup.string().max(50, 'Too Long!').required('Required'),
-  number: Yup.number().required('Required'),
+  name: Yup.string().min(2, 'Too short!').required('Name is required'),
+  number: Yup.number().required('Must be filled'),
 });
 
-export const NameInput = ({ addstate, state }) => {
+
+
+export const NameInput = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
+
+  const addNewContact = newContact => {
+    const hasContact = contacts.some(contact => contact.name === newContact.name);
+
+    if (hasContact) {
+      alert('A contact with that name already exists');
+      return;
+    };
+
+    dispatch(addContact(newContact));
+  }
   return (
     <Formik
       initialValues={{
         name: '',
         number: '',
       }}
-
       validationSchema={NameInputSchema}
       onSubmit={(values, actions) => {
-        let check = state.contacts.find(e => e.name === values.name);
-
-        if (check === undefined) {
-          actions.resetForm();
-
-          addstate(values);
-        } else {
-          alert(`"${values.name}" is alredy in contacts`);
-        }
+        addNewContact(values);
         actions.resetForm();
       }}
     >
@@ -33,13 +42,13 @@ export const NameInput = ({ addstate, state }) => {
         <label>
           Name
           <Field type="text" name="name" placeholder="Name" />
-          <ErrorMessage name="name"/>
+          <ErrorMessage name="name" />
         </label>
 
         <label>
           Number
           <Field type="tel" name="number" placeholder="Number" />
-          <ErrorMessage name="number"/>
+          <ErrorMessage name="number" />
         </label>
         <button type="submit">Add contact</button>
       </StyledForm>
