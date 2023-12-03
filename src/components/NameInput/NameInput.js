@@ -7,25 +7,27 @@ import * as Yup from 'yup';
 
 const NameInputSchema = Yup.object().shape({
   name: Yup.string().min(2, 'Too short!').required('Name is required'),
-  number: Yup.number().required('Must be filled'),
+  number: Yup.string()
+    .matches(/^\+[1-9]\d{1,14}$/, 'Invalid phone number format')
+    .required('Must be filled'),
 });
-
-
 
 export const NameInput = () => {
   const dispatch = useDispatch();
   const contacts = useSelector(getContacts);
 
   const addNewContact = newContact => {
-    const hasContact = contacts.some(contact => contact.name === newContact.name);
+    const hasContact = contacts.some(
+      contact => contact.name === newContact.name
+    );
 
     if (hasContact) {
       alert('A contact with that name already exists');
       return;
-    };
+    }
 
     dispatch(addContact(newContact));
-  }
+  };
   return (
     <Formik
       initialValues={{
